@@ -1,0 +1,186 @@
+# ActReady — EU AI Act (Regulation (EU) 2024/1689) obligation catalog
+# Hand-authored seed catalog. Condensed for v0.1: not legal advice; mappings are engineering heuristics.
+version: "0.1.0"
+updated: "2026-08-23"
+base_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+entries:
+  # ---- Article 9: Risk management system ----
+  - id: EUAI-ART-9-1
+    article: 9
+    title: Establish a risk management system
+    description: >
+      Providers of high-risk AI systems must establish, implement, document and maintain a continuous,
+      iterative risk management system planned and run across the entire lifecycle.
+    control_ids: [A.5.5]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e3210-1-1-1-1-1-1-1"
+  - id: EUAI-ART-9-2
+    article: 9
+    title: Continuous lifecycle risk identification and mitigation
+    description: >
+      The risk management system must cover identification and analysis of foreseeable risks arising from
+      intended use and reasonably foreseeable misuse, and adoption of targeted mitigation measures.
+    control_ids: [A.5.5, A.5.6, A.6.7]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e3210-1-1-1-1-1-1-1"
+
+  # ---- Article 10: Data and data governance ----
+  - id: EUAI-ART-10-1
+    article: 10
+    title: Training/validation/testing data governance
+    description: >
+      Training, validation and testing data sets must be subject to appropriate data governance and
+      management practices relevant to the intended purpose.
+    control_ids: [A.6.3, A.7.2, A.7.3]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e3448-1-1-1-1-1-1-1"
+  - id: EUAI-ART-10-2
+    article: 10
+    title: Relevant design choices and bias examination
+    description: >
+      Data sets must be examined for possible biases and mitigated as far as possible per intended purpose;
+      design choices documented.
+    control_ids: [A.7.6, A.6.3]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e3448-1-1-1-1-1-1-1"
+  - id: EUAI-ART-10-3
+    article: 10
+    title: Data provenance and collection documentation
+    description: >
+      Data collection processes, origins and preparatory operations must be documented where relevant to the
+      intended purpose.
+    control_ids: [A.7.1, A.7.3, A.6.4]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e3448-1-1-1-1-1-1-1"
+  - id: EUAI-ART-10-5
+    article: 10
+    title: Appropriate data examination for biases and gaps
+    description: >
+      Examination in view of possible biases likely to affect health, safety, fundamental rights, and
+      appropriateness of measures to detect, prevent, mitigate bias.
+    control_ids: [A.7.6, A.7.2]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e3448-1-1-1-1-1-1-1"
+
+  # ---- Article 11: Technical documentation ----
+  - id: EUAI-ART-11-1
+    article: 11
+    title: Technical documentation before market placement
+    description: >
+      Providers must draw up and keep up-to-date technical documentation (Annex IV) demonstrating compliance,
+      including general description, elements, development and evaluation.
+    control_ids: [A.6.4, A.8.4]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e3695-1-1-1-1-1-1-1"
+  - id: EUAI-ART-11-2
+    article: 11
+    title: Documentation kept up to date on material change
+    description: >
+      Technical documentation must be kept current when the system or its intended purpose materially changes.
+    control_ids: [A.6.4, A.6.7]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e3695-1-1-1-1-1-1-1"
+
+  # ---- Article 12: Record-keeping / logging ----
+  - id: EUAI-ART-12-1
+    article: 12
+    title: Automatic event logging over lifetime
+    description: >
+      High-risk systems must technically allow automatic recording of events (logs) at national-data-set level
+      over the lifetime of the system.
+    control_ids: [A.9.3]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e3862-1-1-1-1-1-1-1"
+  - id: EUAI-ART-12-3
+    article: 12
+    title: Log traceability for incident follow-up
+    description: >
+      Logging must support traceability of the system's functioning and post-market monitoring, incl.
+      substantial modification and periodic review.
+    control_ids: [A.9.3, A.9.4, A.9.5]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e3862-1-1-1-1-1-1-1"
+
+  # ---- Article 13: Transparency and provision of information to deployers ----
+  - id: EUAI-ART-13-1
+    article: 13
+    title: Instructions for use for deployers
+    description: >
+      Systems must be accompanied by instructions for use with concise, complete, correct, clear, relevant,
+      accessible info enabling deployers to interpret output appropriately.
+    control_ids: [A.8.2]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e3985-1-1-1-1-1-1-1"
+  - id: EUAI-ART-13-2
+    article: 13
+    title: Documented capabilities, limitations, known risks
+    description: >
+      Instructions must cover characteristics/capabilities, performance limitations, known/foreseeable risks
+      incl. human oversight measures needed.
+    control_ids: [A.8.4, A.8.2]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e3985-1-1-1-1-1-1-1"
+  - id: EUAI-ART-13-3
+    article: 13
+    title: Human oversight measures described for deployers
+    description: >
+      Instructions must describe measures enabling deployers to fulfil Art. 14 human oversight obligations.
+    control_ids: [A.9.2, A.8.2]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e3985-1-1-1-1-1-1-1"
+
+  # ---- Article 14: Human oversight ----
+  - id: EUAI-ART-14-1
+    article: 14
+    title: Design for effective human oversight
+    description: >
+      High-risk systems must be designed and developed so natural persons can effectively oversee them while
+      in use.
+    control_ids: [A.9.2]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e4086-1-1-1-1-1-1-1"
+  - id: EUAI-ART-14-4
+    article: 14
+    title: Oversight measures to prevent automation risk
+    description: >
+      Measures must enable overseers to understand limits, remain aware of automation bias, correctly
+      interpret output, decide not to use output, intervene or stop via stop button/procedure.
+    control_ids: [A.9.2, A.9.5]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e4086-1-1-1-1-1-1-1"
+
+  # ---- Article 15: Accuracy, robustness, cybersecurity ----
+  - id: EUAI-ART-15-1
+    article: 15
+    title: Accuracy metrics and declared levels
+    description: >
+      Systems must be designed for appropriate accuracy levels and declared in instructions; metrics chosen
+      fit-for-purpose and documented.
+    control_ids: [A.6.5, A.8.4]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e4204-1-1-1-1-1-1-1"
+  - id: EUAI-ART-15-2
+    article: 15
+    title: Robustness across foreseeable environments
+    description: >
+      Robustness against errors, faults, inconsistencies, unexpected inputs and performance variance across
+      environments/lifecycle.
+    control_ids: [A.6.5, A.9.4]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e4204-1-1-1-1-1-1-1"
+  - id: EUAI-ART-15-3
+    article: 15
+    title: Resilience vs unauthorized attempts and feedback-loop mitigation
+    description: >
+      Resist attempts by unauthorised third parties to alter use/output causing erroneous behaviour; mitigate
+      feedback loops.
+    control_ids: [A.9.4, A.9.5, A.10.3]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e4204-1-1-1-1-1-1-1"
+  - id: EUAI-ART-15-5
+    article: 15
+    title: Post-market accuracy/robustness consistency
+    description: >
+      Continued consistency between declared accuracy/robustness and real-world performance after placement.
+    control_ids: [A.9.3, A.9.4, A.6.5]
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#d1e4204-1-1-1-1-1-1-1"
+
+  # ---- Cross-article organizational hooks (REVIEW-COUNSEL) ----
+  - id: EUAI-XORG-1
+    article: 9
+    title: Governance policy underpinning risk process
+    description: >
+      REVIEW-COUNSEL: organizational policy baseline evidencing a managed approach that Articles 9-15 assume
+      exists at providers.
+    control_ids: [A.5.1, A.5.2, A.5.10]
+    source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+  - id: EUAI-XORG-2
+    article: 13
+    title: Stakeholder disclosure baseline
+    description: >
+      REVIEW-COUNSEL: disclosure-of-AI-interaction practices supporting transparency expectations across
+      Articles 13 and 50.
+    control_ids: [A.8.1, A.8.3]
+    source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"

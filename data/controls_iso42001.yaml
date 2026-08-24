@@ -1,0 +1,164 @@
+# ActReady — ISO/IEC 42001:2023 Annex A control catalog (condensed)
+# Hand-authored seed catalog. Condensed for v0.1: not a substitute for the standard.
+version: "0.1.0"
+updated: "2026-08-23"
+entries:
+  # ---- A.5 Organizational controls ----
+  - id: A.5.1
+    name: Policies for AI systems
+    description: Documented, approved, communicated AI policy including scope and commitment to responsible AI development and use.
+    evidence_types: [policy]
+  - id: A.5.2
+    name: AI roles and responsibilities
+    description: Defined accountabilities for AI governance, development, operation and oversight across the organization.
+    evidence_types: [policy]
+  - id: A.5.3
+    name: Segregation of AI resources
+    description: Development, test and production AI environments and datasets are separated to protect integrity and confidentiality.
+    evidence_types: [policy]
+  - id: A.5.4
+    name: Inventory of AI systems and services
+    description: Maintained inventory of AI systems and services in use, their purpose, owners, risk classification and status.
+    evidence_types: [policy, model_card]
+  - id: A.5.5
+    name: AI risk assessment methodology
+    description: Documented methodology for identifying, analyzing and evaluating AI-specific risks integrated with the org-wide risk process.
+    evidence_types: [policy]
+  - id: A.5.6
+    name: Impact assessment process
+    description: Process for assessing impacts of AI systems on individuals, groups and society prior to deployment and at material changes.
+    evidence_types: [policy]
+  - id: A.5.7
+    name: AI lifecycle governance framework
+    description: Governance framework covering design, development, deployment and retirement stages of AI systems.
+    evidence_types: [policy]
+  - id: A.5.8
+    name: Third-party AI engagement
+    description: Process governing engagement with third parties supplying or consuming AI systems, incl. due diligence.
+    evidence_types: [policy]
+  - id: A.5.9
+    name: Documented information control
+    description: Creation, maintenance and retention of documented governance information required by the AI management system.
+    evidence_types: [policy]
+  - id: A.5.10
+    name: AI project governance
+    description: Defined checkpoints and approvals for AI projects aligned to organizational risk appetite.
+    evidence_types: [policy]
+
+  # ---- A.6 AI system lifecycle ----
+  - id: A.6.1
+    name: AI system requirements definition
+    description: Requirements specification covering intended purpose, users, environment and constraints before build.
+    evidence_types: [model_card]
+  - id: A.6.2
+    name: AI system design and development
+    description: Design and development performed under defined processes incl. peer review and reproducibility practices.
+    evidence_types: [model_card]
+  - id: A.6.3
+    name: Development data quality
+    description: Training and validation datasets assessed for quality, lineage and fitness for the stated requirement.
+    evidence_types: [model_card, eval_run]
+  - id: A.6.4
+    name: Provenance documentation
+    description: Documentation of model, data and component provenance sufficient to reproduce and audit the AI system.
+    evidence_types: [model_card]
+  - id: A.6.5
+    name: Verification and validation
+    description: Testing and evaluation demonstrating the system performs consistently with its intended purpose before release.
+    evidence_types: [eval_run]
+  - id: A.6.6
+    name: Release approval
+    description: Formal release decision recorded by accountable owners after required checks pass.
+    evidence_types: [policy, eval_run]
+  - id: A.6.7
+    name: Change management
+    description: Controlled process for retraining, fine-tuning, prompt/config changes and re-validation upon material change.
+    evidence_types: [policy, eval_run]
+
+  # ---- A.7 Data controls ----
+  - id: A.7.1
+    name: Data sourcing and acquisition
+    description: Lawful, documented sourcing of data incl. licensing, consent basis and restrictions for training corpora.
+    evidence_types: [model_card]
+  - id: A.7.2
+    name: Data quality assurance
+    description: Quality checks (completeness, accuracy, coverage) applied to datasets used for training and evaluation.
+    evidence_types: [eval_run]
+  - id: A.7.3
+    name: Data preparation
+    description: Documented cleaning, labelling and augmentation practices preserving traceability to source data.
+    evidence_types: [model_card]
+  - id: A.7.4
+    name: Personal data protection
+    description: Handling of personal and sensitive data consistent with applicable privacy law and internal policy.
+    evidence_types: [policy, model_card]
+  - id: A.7.5
+    name: Data retention and disposal
+    description: Defined retention periods and secure disposal for datasets, artifacts and logs.
+    evidence_types: [policy]
+  - id: A.7.6
+    name: Bias and representativeness examination
+    description: Examination of datasets for imbalance, bias and representativeness with documented findings and mitigations.
+    evidence_types: [eval_run]
+
+  # ---- A.8 Information for interested parties ----
+  - id: A.8.1
+    name: Transparency objectives
+    description: Defined goals for what must be disclosed about AI systems to stakeholders and when.
+    evidence_types: [policy]
+  - id: A.8.2
+    name: User-facing documentation
+    description: Instructions for use, limitations and safe-operation guidance provided to deployers and users.
+    evidence_types: [model_card]
+  - id: A.8.3
+    name: Disclosure of AI interaction
+    description: Users are informed when they interact with an AI system or receive AI-generated content.
+    evidence_types: [policy, model_card]
+  - id: A.8.4
+    name: Capability reporting (model cards)
+    description: Published summary of capabilities, intended use, evaluations and known limitations per model/system.
+    evidence_types: [model_card, eval_run]
+  - id: A.8.5
+    name: Incident communication
+    description: Communication protocol for informing affected stakeholders about significant incidents and remediation.
+    evidence_types: [policy, incident_log]
+
+  # ---- A.9 Use of AI systems ----
+  - id: A.9.1
+    name: Responsible-use guidelines
+    description: Guidance and training for end users on acceptable and prohibited uses of deployed AI systems.
+    evidence_types: [policy]
+  - id: A.9.2
+    name: Human oversight in operation
+    description: Effective human oversight measures incl. ability to interpret, intervene in, or stop system output.
+    evidence_types: [policy, incident_log]
+  - id: A.9.3
+    name: Operational monitoring and logging
+    description: Automatic recording of operational events and decisions over the system lifetime, tamper-resistant.
+    evidence_types: [incident_log, eval_run]
+  - id: A.9.4
+    name: Anomaly detection
+    description: Monitoring to detect unexpected behavior, drift and anomalies in live AI systems.
+    evidence_types: [incident_log, eval_run]
+  - id: A.9.5
+    name: Escalation and rollback
+    description: Documented escalation paths and rollback/recovery procedures for degraded or harmful behavior.
+    evidence_types: [policy, incident_log]
+
+  # ---- A.10 Third-party and customer relationships ----
+  - id: A.10.1
+    name: Supplier AI risk assessment
+    description: Assessment of AI-related risks introduced by suppliers, models and services before and during use.
+    evidence_types: [policy, model_card]
+  - id: A.10.2
+    name: Contractual security and governance flow-down
+    description: Contracts impose AI governance, security and audit requirements on providers and partners.
+    evidence_types: [policy]
+  - id: A.10.3
+    name: Supplier performance monitoring
+    description: Ongoing monitoring of supplier/model performance, changes and incident history.
+    evidence_types: [incident_log, eval_run]
+  - id: A.10.4
+    name: Customer transparency commitments
+    description: Meeting customer obligations to disclose and document AI usage in delivered products/services.
+    evidence_types: [model_card, policy]
