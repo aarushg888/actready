@@ -1,0 +1,16 @@
+model_name: ticket-triage-beta
+owner: platform-ml-team
+version: "0.3.2"
+intended_use: >
+  Classify inbound customer support tickets into queues and suggest draft replies
+  for human review.
+training_data_summary: >
+  1.8M anonymized historical support tickets from 2024-2026, deduplicated,
+  PII-scrubbed via Presidio, labelled by the support ops team.
+eval_results:
+  accuracy: 0.91
+  f1_macro: 0.87
+  hallucination_rate: 0.04
+limitations:
+  - Performance degrades on tickets in languages other than EN/DE.
+  - Draft replies always require human approval before sending.

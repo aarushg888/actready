@@ -1,0 +1,4 @@
+date,severity,description,remediation
+2026-07-02,major,Wrong refund amount quoted to a customer,Prompt updated and regression test added
+2026-06-15,minor,Latency spike on EU endpoint,Autoscaling policy adjusted
+2026-05-28,critical,Draft reply sent without human approval in beta cohort,Oversight gate re-enabled; incident review held
