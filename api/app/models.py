@@ -59,7 +59,7 @@ class Obligation(BaseModel):
     id: str
     article: int
     title: str
-    description: "str"
+    description: str
     control_ids: list[str]
     source_url: str
 

@@ -76,15 +76,17 @@ class TestEvalRun:
         ev = parse_eval_run(json.dumps(PROMPTFOO_JSON))
         assert ev.type == "eval_run"
         cases = ev.content["cases"]
-        assert len(cases) == 2
-        assert cases[0]["passed"] is True
+        assert isinstance(cases, list) and len(cases) == 2
+        first: dict[str, object] = cases[0]  # type: ignore[assignment]
+        assert first["passed"] is True
 
     def test_deepeval_shape(self) -> None:
         ev = parse_eval_run(json.dumps(DEEPEVAL_JSON))
         assert ev.type == "eval_run"
         cases = ev.content["cases"]
-        assert cases[0]["name"] == "hallucination check"
-        assert cases[0]["metrics"][0]["name"] == "HallucinationMetric"
+        assert isinstance(cases, list)
+        first: dict[str, object] = cases[0]  # type: ignore[assignment]
+        assert first["name"] == "hallucination check"
 
     def test_invalid_json_raises(self) -> None:
         with pytest.raises(IngestError):

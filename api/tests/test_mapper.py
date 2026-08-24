@@ -63,7 +63,11 @@ class TestObligationRollup:
     def test_obligations_roll_up_from_linked_controls(self) -> None:
         ev = [Evidence(type="policy", content={}, collected_at=TODAY)]
         report = map_evidence(ev)
-        art9_items = [i for i in report.items if any(o.startswith("EUAI-ART-9") or o.startswith("EUAI-XORG") for o in i.obligation_ids)]
+        art9_items = [
+            i
+            for i in report.items
+            if any(o.startswith("EUAI-ART-9") or o.startswith("EUAI-XORG") for o in i.obligation_ids)
+        ]
         assert art9_items, "expected at least one item rolled up to an Article 9 obligation"
         a55 = next(i for i in report.items if i.control_id == "A.5.5")
         assert any(o.startswith("EUAI-ART-9") for o in a55.obligation_ids)
