@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   ActReady design tokens (FE-4)
+   Light, dense, dev-tool feel. Single blue accent; the only
+   "loud" colors are the semantic status hues.
+   ============================================================ */
+@layer base {
+  :root {
+    --background: 0 0% 100%; /* white app */
+    --foreground: 222 47% 11%; /* near-black slate */
+
+    --muted: 210 40% 96%; /* panel bg */
+    --muted-foreground: 215 16% 47%; /* secondary text */
+
+    --border: 214 32% 91%;
+
+    --primary: 221 83% 53%; /* ActReady blue — single restrained accent */
+    --primary-foreground: 0 0% 100%;
+    --ring: 221 83% 53%;
+
+    /* semantic status — the only "loud" colors (FR §1b) */
+    --status-satisfied: 142 71% 45%; /* green  */
+    --status-partial: 38 92% 50%; /* amber  */
+    --status-missing: 0 72% 51%; /* red    */
+    --status-satisfied-fg: 0 0% 100%;
+    --status-partial-fg: 0 0% 100%;
+    --status-missing-fg: 0 0% 100%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* tabular numerals for scores / hashes */
+  .font-mono {
+    font-feature-settings: 'tnum';
+  }
+}
+
+@layer components {
+  /* 11px uppercase status chip label */
+  .status-chip {
+    @apply inline-flex items-center rounded-chip px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide;
+  }
+  .section-title {
+    @apply text-[13px] font-semibold uppercase tracking-wide text-muted-foreground;
+  }
+}
