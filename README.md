@@ -103,8 +103,19 @@ uv run mypy .                  # types
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for branch conventions and the PR checklist.
-Market sizing and research live in [docs/tam-sam-som.md](docs/tam-sam-som.md) and
-[docs/research-brief.md](docs/research-brief.md).
+
+## Research & v0.2 planning
+
+This repo is research-driven. The gold idea (ActReady) was selected after a full
+market/competitor/feasibility gauntlet; the v0.2 scope below is the output of a
+multi-agent ideation → planning loop.
+
+- **Market & competitive research:** [docs/research-deep-dive.md](docs/research-deep-dive.md) — EU AI Act + ISO 42001 obligations, 12-competitor landscape, the confirmed gap (no incumbent compiles evidence from ML pipelines), demand signals.
+- **Domain research briefs:** [backend](docs/backend-research.md) · [frontend](docs/frontend-research.md) · [ML/AI](docs/ml-research.md)
+- **v0.2 plans (decision-locked):** [backend](docs/planning/backend-plan.md) · [frontend](docs/planning/frontend-plan.md) · [ML](docs/planning/ml-plan.md) · [product strategy & milestones](docs/planning/product-plan.md)
+- **Consolidated backlog + top-10:** [ISSUES.md](ISSUES.md)
+- **Target architecture sketch:** [ARCHITECTURE.md](ARCHITECTURE.md)
+- Earlier v0.1 market sizing: [docs/tam-sam-som.md](docs/tam-sam-som.md), [docs/research-brief.md](docs/research-brief.md)
 
 ## License
 
