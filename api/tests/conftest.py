@@ -32,8 +32,14 @@ _DEV_URL = os.environ.get(
     "DATABASE_URL",
     "postgresql+asyncpg://actready:actready@localhost:5432/actready",
 )
-# Swap the database segment for the test database.
-_TEST_DB_URL = _DEV_URL.rsplit("/", 1)[0] + "/actready_test"
+# The tests run directly against the database named by DATABASE_URL. We deliberately
+# do NOT spin up a separate `actready_test` database: doing so required the
+# migration step to target a different DB than DATABASE_URL points at, which
+# fought migrations/env.py's "DATABASE_URL from env wins" precedence and silently
+# migrated the wrong database in CI (tables ended up in `actready`, tests hit an
+# empty `actready_test`). Running against DATABASE_URL directly makes the target
+# unambiguous — CI provisions a fresh `actready` per run, so this is clean.
+_TEST_DB_URL = _DEV_URL
 # A superuser (bypassrls) URL for setup/teardown and privileged ops.
 _ADMIN_URL = _TEST_DB_URL
 
@@ -51,18 +57,12 @@ async def admin_engine():
 
 @pytest_asyncio.fixture(scope="session", loop_scope="session")
 async def test_database(admin_engine):
-    """Create the test database, run migrations, provision app_user. Torn down after."""
-    # Connect to the default 'actready' DB to create/drop the test DB.
-    base = _DEV_URL.rsplit("/", 1)[0] + "/actready"
-    boot = create_async_engine(base, pool_pre_ping=True)
-    async with boot.connect() as conn:
-        await conn.execution_options(isolation_level="AUTOCOMMIT")
-        await conn.execute(text("DROP DATABASE IF EXISTS actready_test"))
-        await conn.execute(text("CREATE DATABASE actready_test"))
-    await boot.dispose()
+    """Run migrations + provision app_user on the DATABASE_URL database. Torn down after."""
+    # The database itself already exists (CI service / local docker). We only
+    # need to ensure the schema (migrations) and the runtime role exist.
 
-    # Run Alembic migrations against the test DB IN-PROCESS (no subprocess, no
-    # env-var ambiguity) so CI deterministically builds the schema including RLS.
+    # Run Alembic migrations IN-PROCESS (no subprocess, no env-var ambiguity)
+    # so CI deterministically builds the schema including RLS.
     from alembic import command
     from alembic.config import Config as AlembicConfig
 
@@ -71,10 +71,10 @@ async def test_database(admin_engine):
     alembic_cfg.set_main_option(
         "script_location", os.path.join(api_dir, "migrations")
     )
-    # Force the migration at the TEST database. migrations/env.py reads
+    # Target the database named by DATABASE_URL. migrations/env.py reads
     # DATABASE_URL from the environment FIRST, so we POP any inherited
-    # DATABASE_URL (e.g. CI's `actready`) and let it fall back to the Config's
-    # sqlalchemy.url below — guaranteeing we never migrate the wrong database.
+    # DATABASE_URL and let it fall back to the Config's sqlalchemy.url below —
+    # this guarantees the migration runs against the same DB the tests use.
     alembic_cfg.set_main_option("sqlalchemy.url", _TEST_DB_URL)
 
     import os as _os
@@ -83,7 +83,6 @@ async def test_database(admin_engine):
     _mig_err: list[BaseException] = []
 
     def _run_migrations() -> None:
-        # Pop so env.py falls back to the Config sqlalchemy.url we just set.
         _os.environ.pop("DATABASE_URL", None)
         try:
             command.upgrade(alembic_cfg, "head")
@@ -104,18 +103,28 @@ async def test_database(admin_engine):
             "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='app_user') "
             "THEN CREATE ROLE app_user LOGIN PASSWORD 'app_user'; END IF; END $$",
             "ALTER ROLE app_user NOBYPASSRLS",
-            "GRANT ALL ON DATABASE actready_test TO app_user",
+            "GRANT ALL ON DATABASE actready TO app_user",
             "GRANT ALL ON SCHEMA public TO app_user",
             "GRANT ALL ON ALL TABLES IN SCHEMA public TO app_user",
             "GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO app_user",
         ):
             await conn.execute(text(stmt))
-    yield _TEST_DB_URL
-    # Teardown
-    boot2 = create_async_engine(base, pool_pre_ping=True)
-    async with boot2.connect() as conn:
+
+    # Start every test session from a clean slate. The database is persistent
+    # (CI's service DB, or the local docker `actready`), so without this, a prior
+    # run's rows leak into the next run and break uniqueness / RLS assertions.
+    # Truncating as the superuser (admin_engine bypasses FORCE RLS) is safe.
+    async with admin_engine.connect() as conn:
         await conn.execution_options(isolation_level="AUTOCOMMIT")
-        await conn.execute(text("DROP DATABASE IF EXISTS actready_test WITH (FORCE)"))
+        await conn.execute(
+            text(
+                "TRUNCATE organizations, users, memberships, integration_connections, "
+                "ingestion_runs, evidence_artifacts, control_mappings, report_snapshots, "
+                "share_links, ml_proposals RESTART IDENTITY CASCADE"
+            )
+        )
+    yield _TEST_DB_URL
+    # Teardown: leave the database in place (CI owns it); just note we're done.
 
 
 @pytest_asyncio.fixture
