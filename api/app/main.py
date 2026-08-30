@@ -1,4 +1,9 @@
-"""FastAPI surface: POST /assess (multipart files[]) and GET /healthz."""
+"""FastAPI surface for ActReady v0.2.
+
+Keeps the v0.1 file-based ``POST /assess`` (single-tenant, no auth) working, and
+adds the v0.2 tenant-aware surface: ``/api/healthz``, ``/auth/*`` and the
+``AssessmentService``-backed ``POST /api/assess`` which persists a report.
+"""
 
 from __future__ import annotations
 
@@ -6,16 +11,21 @@ from typing import Annotated
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 
+from app.auth import PrincipalDep, SessionDep
 from app.ingest import IngestError, collect_evidence
 from app.mapper import map_evidence
 from app.models import GapReport
 from app.report import render_markdown
+from app.routers import auth
+from app.services import AssessmentService
 
 app = FastAPI(
     title="ActReady",
-    version="0.1.0",
+    version="0.2.0",
     description="AI-governance evidence compiler: ISO/IEC 42001 + EU AI Act gap reports.",
 )
+
+app.include_router(auth.router)
 
 _SUFFIX_KIND = {
     ".yaml": "model_card_yaml",
@@ -30,9 +40,14 @@ def healthz() -> dict[str, str]:
     return {"status": "ok", "version": "0.1.0"}
 
 
+@app.get("/api/healthz")
+def api_healthz() -> dict[str, str]:
+    return {"status": "ok", "version": "0.2.0"}
+
+
 @app.post("/assess", response_model=GapReport)
 async def assess(files: Annotated[list[UploadFile], File(min_length=1)]) -> GapReport:
-    """Ingest uploaded evidence files and return a scored GapReport."""
+    """Ingest uploaded evidence files and return a scored GapReport. (v0.1, file-based)"""
     model_card_yaml: str | None = None
     eval_run_json: str | None = None
     incidents_csv: str | None = None
@@ -59,7 +74,7 @@ async def assess(files: Annotated[list[UploadFile], File(min_length=1)]) -> GapR
                 raise HTTPException(status_code=422, detail="multiple model cards uploaded; expected at most one")
             model_card_yaml = text
         elif kind == "eval_run_json":
-            eval_run_json = text  # last one wins; multiple runs are appended content-wise
+            eval_run_json = text
         else:
             incidents_csv = text if incidents_csv is None else f"{incidents_csv}{text}"
 
@@ -73,6 +88,21 @@ async def assess(files: Annotated[list[UploadFile], File(min_length=1)]) -> GapR
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     return map_evidence(evidence)
+
+
+@app.post("/api/assess", response_model=GapReport)
+async def api_assess(
+    principal: PrincipalDep,
+    session: SessionDep,
+) -> GapReport:
+    """Run the deterministic engine over the caller's tenant evidence and persist a
+    versioned ``ReportSnapshot`` (E2.2). Requires a valid bearer token."""
+    service = AssessmentService(session)
+    snapshot = await service.assess(
+        tenant_id=principal.tenant_id,
+        created_by=principal.user_id,
+    )
+    return GapReport.model_validate(snapshot.report_json)
 
 
 @app.get("/assess/markdown", response_model=None)
