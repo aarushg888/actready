@@ -8,6 +8,22 @@ jobs:
     defaults:
       run:
         working-directory: api
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: actready
+          POSTGRES_PASSWORD: actready
+          POSTGRES_DB: actready
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U actready -d actready"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: "postgresql+asyncpg://actready:actready@localhost:5432/actready"
     steps:
       - uses: actions/checkout@v4
 
