@@ -66,7 +66,9 @@ async def test_run_isolated_success_records_success_and_items(session, org_id) -
 
 @pytest.mark.asyncio
 async def test_run_isolated_idempotency_key_persisted(session, org_id) -> None:
-    key = "run-abc-123"
+    # Unique per run so repeated test invocations don't collide on the
+    # UNIQUE constraint (the test DB is reused across tests in a session).
+    key = f"run-{uuid.uuid4().hex}"
     await run_isolated(_OkSource(), org_id, session, idempotency_key=key)
     run = await _latest_run(session, org_id)
     assert run is not None

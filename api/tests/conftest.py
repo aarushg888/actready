@@ -61,27 +61,47 @@ async def test_database(admin_engine):
         await conn.execute(text("CREATE DATABASE actready_test"))
     await boot.dispose()
 
-    # Run Alembic migrations against the test DB via the CLI (spawns its own loop).
+    # Run Alembic migrations against the test DB IN-PROCESS (no subprocess, no
+    # env-var ambiguity) so CI deterministically builds the schema including RLS.
+    from alembic import command
+    from alembic.config import Config as AlembicConfig
 
-    env = dict(os.environ)
-    env["DATABASE_URL"] = _TEST_DB_URL
-    # alembic.ini lives in the api/ directory (parent of tests/).
     api_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    import subprocess as _subprocess
-
-    proc = _subprocess.run(
-        ["uv", "run", "alembic", "upgrade", "head"],
-        cwd=api_dir,
-        env=env,
-        capture_output=True,
-        text=True,
+    alembic_cfg = AlembicConfig(os.path.join(api_dir, "alembic.ini"))
+    alembic_cfg.set_main_option(
+        "script_location", os.path.join(api_dir, "migrations")
     )
-    if proc.returncode != 0:
-        with open("/tmp/alembic_in_test.txt", "w") as _fh:
-            _fh.write("STDOUT:\n" + proc.stdout + "\nSTDERR:\n" + proc.stderr)
-        raise RuntimeError(
-            f"alembic upgrade failed (rc={proc.returncode}): {proc.stderr[-2000:]}"
-        )
+    # Point the migration explicitly at the TEST database, regardless of any
+    # inherited DATABASE_URL in the process environment (this was the CI bug:
+    # the old `uv run alembic` subprocess inherited the parent's DATABASE_URL
+    # and migrated the wrong database).
+    alembic_cfg.set_main_option("sqlalchemy.url", _TEST_DB_URL)
+
+    # Alembic's `command.upgrade` is synchronous — it drives its own event loop
+    # internally (env.py calls asyncio.run). Running it inside a dedicated worker
+    # thread gives it an isolated loop and avoids both "asyncio.run() cannot be
+    # called from a running loop" (pytest-asyncio owns the session loop) and the
+    # double-asyncio.run crash. We also point DATABASE_URL at the TEST database
+    # for the duration of the upgrade: migrations/env.py reads DATABASE_URL from
+    # the environment FIRST, so an inherited DATABASE_URL (e.g. CI's `actready`)
+    # would otherwise migrate the wrong DB.
+    import os as _os
+    import threading
+
+    def _run_migrations() -> None:
+        _prev = _os.environ.get("DATABASE_URL")
+        _os.environ["DATABASE_URL"] = _TEST_DB_URL
+        try:
+            command.upgrade(alembic_cfg, "head")
+        finally:
+            if _prev is None:
+                _os.environ.pop("DATABASE_URL", None)
+            else:
+                _os.environ["DATABASE_URL"] = _prev
+
+    _t = threading.Thread(target=_run_migrations)
+    _t.start()
+    _t.join()
 
     # Provision the app_user runtime role + grants (mirrors the RLS migration but
     # idempotent for repeat test runs).
@@ -103,7 +123,6 @@ async def test_database(admin_engine):
     async with boot2.connect() as conn:
         await conn.execution_options(isolation_level="AUTOCOMMIT")
         await conn.execute(text("DROP DATABASE IF EXISTS actready_test WITH (FORCE)"))
-    await boot2.dispose()
 
 
 @pytest_asyncio.fixture
