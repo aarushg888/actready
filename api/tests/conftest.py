@@ -71,37 +71,30 @@ async def test_database(admin_engine):
     alembic_cfg.set_main_option(
         "script_location", os.path.join(api_dir, "migrations")
     )
-    # Point the migration explicitly at the TEST database, regardless of any
-    # inherited DATABASE_URL in the process environment (this was the CI bug:
-    # the old `uv run alembic` subprocess inherited the parent's DATABASE_URL
-    # and migrated the wrong database).
+    # Force the migration at the TEST database. migrations/env.py reads
+    # DATABASE_URL from the environment FIRST, so we POP any inherited
+    # DATABASE_URL (e.g. CI's `actready`) and let it fall back to the Config's
+    # sqlalchemy.url below — guaranteeing we never migrate the wrong database.
     alembic_cfg.set_main_option("sqlalchemy.url", _TEST_DB_URL)
 
-    # Alembic's `command.upgrade` is synchronous — it drives its own event loop
-    # internally (env.py calls asyncio.run). Running it inside a dedicated worker
-    # thread gives it an isolated loop and avoids both "asyncio.run() cannot be
-    # called from a running loop" (pytest-asyncio owns the session loop) and the
-    # double-asyncio.run crash. We also point DATABASE_URL at the TEST database
-    # for the duration of the upgrade: migrations/env.py reads DATABASE_URL from
-    # the environment FIRST, so an inherited DATABASE_URL (e.g. CI's `actready`)
-    # would otherwise migrate the wrong DB.
     import os as _os
     import threading
 
+    _mig_err: list[BaseException] = []
+
     def _run_migrations() -> None:
-        _prev = _os.environ.get("DATABASE_URL")
-        _os.environ["DATABASE_URL"] = _TEST_DB_URL
+        # Pop so env.py falls back to the Config sqlalchemy.url we just set.
+        _os.environ.pop("DATABASE_URL", None)
         try:
             command.upgrade(alembic_cfg, "head")
-        finally:
-            if _prev is None:
-                _os.environ.pop("DATABASE_URL", None)
-            else:
-                _os.environ["DATABASE_URL"] = _prev
+        except BaseException as _exc:  # surface to the main thread
+            _mig_err.append(_exc)
 
     _t = threading.Thread(target=_run_migrations)
     _t.start()
     _t.join()
+    if _mig_err:
+        raise RuntimeError(f"Alembic migration failed: {_mig_err[0]}") from _mig_err[0]
 
     # Provision the app_user runtime role + grants (mirrors the RLS migration but
     # idempotent for repeat test runs).
